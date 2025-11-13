@@ -61,21 +61,20 @@ check_dev_directory() {
 
 # Function to download devcontainer project
 download_devcontainer() {
-    local repo_url="https://github.com/radikalliberal/devcontainer/archive/main.tar.gz"
+    local url="https://github.com/radikalliberal/devcontainer.git"
     local temp_dir="/tmp/devcontainer-setup"
 
-    log_info "Downloading devcontainer project..."
+    log_info "Cloning devcontainer project..."
 
     # Clean up any existing temp directory
     rm -rf "$temp_dir"
-    mkdir -p "$temp_dir"
 
-    # Download and extract
-    if curl -fsSL "$repo_url" | tar -xz -C "$temp_dir" --strip-components=1; then
-        log_success "Downloaded devcontainer project"
+    # Clone repository
+    if git clone "$url" "$temp_dir"; then
+        log_success "Cloned devcontainer project"
         echo "$temp_dir"
     else
-        log_error "Failed to download devcontainer project"
+        log_error "Failed to clone devcontainer project"
         exit 1
     fi
 }
