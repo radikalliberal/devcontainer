@@ -99,10 +99,23 @@ setup_container() {
         exit 1
     fi
 
-    # Start the container - use exec to replace current process
+    # Start the container interactively
     log_info "Starting container..."
-    log_success "Launching interactive session (temp dir will be cleaned on exit)..."
-    exec docker-compose run --rm --service-ports devcontainer
+    log_success "Launching interactive session..."
+    
+    # Run docker-compose with proper stdin/stdout/stderr
+    # When piped from curl, we need to reconnect to the terminal
+    if [ -t 0 ]; then
+        # stdin is a terminal, use it directly
+        docker-compose run --rm --service-ports devcontainer
+    else
+        # stdin is not a terminal (piped from curl), reconnect to controlling terminal
+        docker-compose run --rm --service-ports devcontainer </dev/tty
+    fi
+    local exit_code=$?
+    
+    log_info "Container session ended"
+    return $exit_code
 }
 
 # Function to cleanup
@@ -156,8 +169,13 @@ main() {
     local devcontainer_dir
     devcontainer_dir=$(download_devcontainer)
 
-    # Setup and launch container (this will exec, so nothing after this runs)
+    # Setup and launch container
     setup_container "$project_name" "$devcontainer_dir"
+    
+    # Cleanup after container exits
+    cleanup "$devcontainer_dir"
+    
+    log_success "DevContainer setup complete!"
 }
 
 # Run main function with all arguments
