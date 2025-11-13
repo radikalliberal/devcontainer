@@ -99,14 +99,10 @@ setup_container() {
         exit 1
     fi
 
-    # Start the container
+    # Start the container - use exec to replace current process
     log_info "Starting container..."
-    if docker-compose run --rm --service-ports devcontainer; then
-        log_success "Container session completed"
-    else
-        log_error "Container failed to start"
-        exit 1
-    fi
+    log_success "Launching interactive session (temp dir will be cleaned on exit)..."
+    exec docker-compose run --rm --service-ports devcontainer
 }
 
 # Function to cleanup
@@ -160,13 +156,8 @@ main() {
     local devcontainer_dir
     devcontainer_dir=$(download_devcontainer)
 
-    # Setup container
+    # Setup and launch container (this will exec, so nothing after this runs)
     setup_container "$project_name" "$devcontainer_dir"
-
-    # Cleanup
-    cleanup "$devcontainer_dir"
-
-    log_success "DevContainer setup complete!"
 }
 
 # Run main function with all arguments
