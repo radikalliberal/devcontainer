@@ -1,0 +1,27 @@
+services:
+  devcontainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: devcontainer-${PROJECT_NAME:-default}
+    privileged: true  # Required for Docker-in-Docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker socket for DinD
+      - ${HOME}/dev:/home/dev/dev:rw  # Mount dev folder
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw  # X11 forwarding (optional)
+      - ${HOME}/.ssh:/home/dev/.ssh:ro  # SSH keys (read-only)
+      - ${SSH_AUTH_SOCK:-/tmp/ssh-agent.sock}:/ssh-agent.sock  # SSH agent socket
+    environment:
+      - DISPLAY=${DISPLAY}  # X11 forwarding
+      - PROJECT_NAME=${PROJECT_NAME:-default}
+      - USER=dev
+      - HOME=/home/dev
+      - SSH_AUTH_SOCK=/ssh-agent.sock  # SSH agent socket
+      - SKIP_GITHUB_CHECK=${SKIP_GITHUB_CHECK:-false}  # Skip GitHub SSH test if true
+    working_dir: /home/dev/dev
+    stdin_open: true
+    tty: true
+    # Network mode host for better networking (optional)
+    # network_mode: host
+    # Override entrypoint to allow custom commands
+    # entrypoint: /bin/zsh
