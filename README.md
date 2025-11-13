@@ -29,6 +29,7 @@ A portable, Docker-based development environment that works across any Linux mac
 ### Install Docker
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt update
 sudo apt install docker.io
@@ -37,6 +38,7 @@ sudo usermod -aG docker $USER
 ```
 
 **Arch Linux:**
+
 ```bash
 sudo pacman -S docker
 sudo systemctl start docker
@@ -44,6 +46,7 @@ sudo usermod -aG docker $USER
 ```
 
 **Fedora:**
+
 ```bash
 sudo dnf install docker
 sudo systemctl start docker
@@ -87,6 +90,7 @@ make run
 ```
 
 The container will:
+
 1. Mount your `~/.ssh` directory (read-only)
 2. Forward the SSH agent socket
 3. Use your existing keys for Git operations
@@ -133,49 +137,10 @@ make run-projectB
 
 ```bash
 # Run with custom project name
-curl -fsSL <short-url> | bash -s -- --project myproject
+bash <(curl -fsSL https://is.gd/RHw93q) --project myproject
 
 # Show help
-curl -fsSL <short-url> | bash -s -- --help
-```
-
-## 🔗 Short URL Setup
-
-Create a memorable short URL for easy access from any machine:
-
-### Option 1: Git.io (Free, GitHub's URL Shortener)
-
-1. Go to https://git.io/
-2. Enter your GitHub raw URL: `https://raw.githubusercontent.com/radikalliberal/devcontainer/main/devcontainer.sh`
-3. Choose a custom code (e.g., `dev`)
-4. Your short URL becomes: `https://git.io/dev`
-
-### Option 2: is.gd (Free, No Account Required)
-
-1. Go to https://is.gd/
-2. Enter: `https://raw.githubusercontent.com/radikalliberal/devcontainer/main/devcontainer.sh`
-3. Choose custom short URL: `dev.yourname`
-4. Result: `https://is.gd/dev.yourname`
-
-### Option 3: TinyURL.com (Free)
-
-1. Go to https://tinyurl.com/
-2. Enter the raw URL and customize
-3. Example: `https://tinyurl.com/devcontainer-setup`
-
-### Option 4: Custom Domain (Advanced)
-
-Use Cloudflare Workers or similar for `dev.yourdomain.com`:
-
-```javascript
-// Cloudflare Worker script
-addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
-})
-
-async function handleRequest(request) {
-  return fetch('https://raw.githubusercontent.com/radikalliberal/devcontainer/main/devcontainer.sh')
-}
+bash <(curl -fsSL https://is.gd/RHw93q) --help
 ```
 
 ## 🏗️ Architecture
@@ -233,6 +198,7 @@ Edit these files to customize your environment:
 ### Common Issues
 
 **"Docker not found"**
+
 ```bash
 # Install Docker
 sudo apt install docker.io  # Ubuntu/Debian
@@ -248,6 +214,7 @@ sudo usermod -aG docker $USER
 ```
 
 **"Permission denied" on ~/dev**
+
 ```bash
 # Ensure ~/dev exists and is writable
 mkdir -p ~/dev
@@ -255,11 +222,13 @@ ls -la ~/dev
 ```
 
 **GitHub authentication fails**
+
 - Ensure you have a GitHub account
 - Complete the device authentication in your browser
 - Check internet connection
 
 **Container exits immediately**
+
 ```bash
 # Check logs
 make logs
@@ -269,6 +238,7 @@ make shell
 ```
 
 **Build fails**
+
 ```bash
 # Clean and rebuild
 make clean
@@ -320,3 +290,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 **Happy coding! 🎉**
 
 For issues or questions, please open an issue on GitHub.
+

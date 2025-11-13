@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # DevContainer Bootstrap Script
-# Usage: curl -fsSL <short-url> | bash [-s -- <project-name>]
+# Usage: bash <(curl -fsSL https://is.gd/RHw93q)
 
 # Colors for output
 RED='\033[0;31m'
@@ -102,20 +102,10 @@ setup_container() {
     # Start the container interactively
     log_info "Starting container..."
     log_success "Launching interactive session..."
-    
-    # Run docker-compose with proper stdin/stdout/stderr
-    # When piped from curl, we need to reconnect to the terminal
-    if [ -t 0 ]; then
-        # stdin is a terminal, use it directly
-        docker-compose run --rm --service-ports devcontainer
-    else
-        # stdin is not a terminal (piped from curl), reconnect to controlling terminal
-        docker-compose run --rm --service-ports devcontainer </dev/tty
-    fi
-    local exit_code=$?
-    
-    log_info "Container session ended"
-    return $exit_code
+
+    # Execute docker-compose and replace this process with it
+    # This ensures we land in the container shell
+    exec docker-compose run --rm --service-ports devcontainer
 }
 
 # Function to cleanup
@@ -140,15 +130,15 @@ main() {
             echo "DevContainer Bootstrap Script"
             echo ""
             echo "Usage:"
-            echo "  curl -fsSL <url> | bash [-s -- <options>]"
+            echo "  bash <(curl -fsSL <url>) [<options>]"
             echo ""
             echo "Options:"
             echo "  --project, -p <name>    Project name (default: default)"
             echo "  --help, -h             Show this help"
             echo ""
             echo "Examples:"
-            echo "  curl -fsSL <url> | bash"
-            echo "  curl -fsSL <url> | bash -s -- --project myproject"
+            echo "  bash <(curl -fsSL <url>)"
+            echo "  bash <(curl -fsSL <url>) --project myproject"
             exit 0
             ;;
         *)
@@ -169,15 +159,9 @@ main() {
     local devcontainer_dir
     devcontainer_dir=$(download_devcontainer)
 
-    # Setup and launch container
+    # Setup and launch container (exec will replace this process)
     setup_container "$project_name" "$devcontainer_dir"
-    
-    # Cleanup after container exits
-    cleanup "$devcontainer_dir"
-    
-    log_success "DevContainer setup complete!"
 }
 
 # Run main function with all arguments
 main "$@"
-
